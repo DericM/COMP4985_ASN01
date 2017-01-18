@@ -15,6 +15,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK    MainDlg(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -100,10 +101,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
+
    if (!hWnd)
    {
       return FALSE;
    }
+
+   HWND hMainDlg = CreateDialogW(hInst, MAKEINTRESOURCE(IDD_MAIN_DIALOG), hWnd, MainDlg);
+   ShowWindow(hMainDlg, SW_SHOW);
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
@@ -157,6 +162,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
+}
+
+// Message handler for main dlg box.
+INT_PTR CALLBACK MainDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			SendMessage(GetParent(hDlg), WM_DESTROY, 0, 0);
+			//PostQuitMessage(0);
+			return (INT_PTR)TRUE;
+		}
+		int wmId = LOWORD(wParam);
+		switch (wmId)
+		{
+
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
 }
 
 // Message handler for about box.
